@@ -3,6 +3,7 @@ from pprint import pprint
 from datetime import datetime
 from pydantic import BaseModel, Field, field_validator
 from typing import List, Optional, Dict, Any
+from air_bnb_database import send_to_db
 
 def load_file(file_name: str):
     with open(file_name,"rb") as f:
@@ -199,12 +200,6 @@ def parser(data, result):
             parser(item, result)
     return result
 
-            
-def dump_file(validated_data: dict):
-    with open(f"air_bnb_{datetime.now().date()}.json","wb") as f:
-        f.write(json.dumps(validated_data, indent=4,ensure_ascii=False).encode())
-
-
 
 file="air_bnb.json"
 json_data=load_file(file)
@@ -233,7 +228,7 @@ result = {
 extracted=parser(json_data,result)
 try:
     validated = Airbnb(**extracted)
-    dump_file(validated.model_dump())
+    send_to_db(validated.model_dump())
 
 except Exception as e:
     print("Validation error:", e)
